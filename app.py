@@ -18,6 +18,9 @@ def parse_cl_args():
 
 args = parse_cl_args()
 
+if not os.path.exists(args.outfolder):
+    os.mkdir(args.outfolder)
+
 exchange_id = 'binance'
 exchange_class = getattr(ccxt, exchange_id)
 exchange = exchange_class({
@@ -27,6 +30,8 @@ exchange = exchange_class({
 
 market_name = 'ETH/BTC'
 candle_interval = '1m'
+
+
 ohlcv = exchange.fetch_ohlcv(market_name, candle_interval)
 
 # timestamp in seconds instead of milliseconds
@@ -40,14 +45,24 @@ ohlcv_dict = {
     "volume": [d[5] for d in ohlcv],
 }
 
+candles_per_hour = {}
+
 for candle in ohlcv:
     ts = int(candle[0] / 1000)
     hour = int(ts / 3600)
     hour_start_ts = hour * 3600
-    print(datetime.utcfromtimestamp(hour_start_ts), hour_start_ts, ts)
+    if not hour_start_ts in candles_per_hour:
+        candles_per_hour[hour_start_ts] = []
+    candles_per_hour[hour_start_ts].append(candle)
 
-outfilename = '{}-{}-{}-{}.json'.format(market_name.replace(
-    '/', ''), candle_interval, timestamp, len(ohlcv))
+for key, value in candles_per_hour.items():
+    complete_filename = '{}-{}-{}-{}.complete.json'.format(exchange_id, market_name.replace(
+        '/', ''), candle_interval, timestamp)
+    if os.path.exists(complete_filename):
+        continue
+    last_hour_ts =
+
+exit()
 
 with open(os.path.join(args.outfolder, outfilename), 'w') as outfile:
     json.dump(ohlcv_dict, outfile)
