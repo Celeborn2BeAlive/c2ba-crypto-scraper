@@ -132,9 +132,9 @@ for tf in timedeltas.keys():
                         current_dict = json.load(f)
                 else:
                     current_dict = {
-                        "openTimestamp": candle["openDate"].timestamp(),
+                        "openTimestamp": int(candle["openDate"].timestamp()), 
                         "timeframe": tf,
-                        "openDate": str(candle["openDate"]),
+                        "openDate": candle["openDate"].strftime('%Y-%m-%d %H:%M:%S'),
                         "open": [], "high": [], "low": [], "close": [], "volume": [],
                         # "openDate": [], "closeDate": []
                     }
